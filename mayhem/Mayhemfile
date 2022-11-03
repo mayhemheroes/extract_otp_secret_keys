@@ -1,0 +1,8 @@
+project: extract-otp-secret-keys
+target: extract-secrets
+testsuite:
+    - file://mayhem/testsuite
+
+cmds:
+  - cmd: /src/mayhem/fuzz_extract.py
+    libfuzzer: true
