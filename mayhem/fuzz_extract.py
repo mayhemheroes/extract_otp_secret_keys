@@ -17,7 +17,7 @@ from pathlib import Path
 
 # Patch the source code to use a version of fileinput that doesn't rely on global state
 # Makes this program fuzzable
-fileinput.input = fileinput.FileInput
+fileinput.input = lambda x: x
 
 # Since this isn't a module, we must inject the parent directory into the import path
 source_dir = Path(os.path.dirname(os.path.abspath(__file__))).parent.absolute()
@@ -48,7 +48,7 @@ def nostdout():
 
 @dataclass
 class FakeArgObject:
-    infile: str
+    infile: object
     json: bool
     csv: bool
     printqr: bool
@@ -68,14 +68,11 @@ def raise_sometimes(e, percent: int):
         raise e
 @atheris.instrument_func
 def TestOneInput(data):
-    data = data.decode('utf-8', errors='ignore').encode()
+    data = data.decode('utf-8', errors='ignore')
 
     try:
-        with tempfile.NamedTemporaryFile() as f:
-            f.write(data)
-            f.seek(0)
-            f.flush()
-            fake_args.infile = f.name
+        with io.StringIO(data) as f:
+            fake_args.infile = f
             with nostdout():
                 extract_otps(fake_args)
     except binascii.Error:
@@ -84,12 +81,12 @@ def TestOneInput(data):
         if 'bad query' in str(e):
             # This is raised too often to even be fuzzable, as urllib exceptions were not caught by the target
             return -1
-        raise_sometimes(e, 5)
+        raise_sometimes(e, 2)
     except SystemExit:
         # The program exits with 1 if it can't find any OTPs, which is expected
         return -1
     except Exception as e:
-        raise_sometimes(e, 5)
+        raise_sometimes(e, 2)
 
 def main():
     atheris.Setup(sys.argv, TestOneInput)
