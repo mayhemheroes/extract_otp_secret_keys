@@ -64,7 +64,8 @@ def raise_sometimes(e, percent: int):
     """
     Optionally raise an exception by a percentile
     """
-    if random.randint(0, 100) <= percent:
+    
+    if 100 * random.random() <= percent:
         raise e
 @atheris.instrument_func
 def TestOneInput(data):
