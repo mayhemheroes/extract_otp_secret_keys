@@ -8,7 +8,6 @@ import google.protobuf.message
 import io
 import logging
 import os
-import random
 import sys
 import tempfile
 from dataclasses import dataclass
@@ -59,14 +58,21 @@ class FakeArgObject:
 # Build fake object to bypass argparse
 fake_args = FakeArgObject('uninit', False, False, False, False, False, True)
 
+raise_threshold = 1000
+raise_count = 0
+
 @atheris.instrument_func
 def raise_sometimes(e, percent: int):
     """
     Optionally raise an exception by a percentile
     """
-    
-    if 100 * random.random() <= percent:
+    global raise_count
+    raise_count += 1
+
+    if raise_count >= raise_threshold:
+        raise_count = 0
         raise e
+
 @atheris.instrument_func
 def TestOneInput(data):
     data = data.decode('utf-8', errors='ignore')
