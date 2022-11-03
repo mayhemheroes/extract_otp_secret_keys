@@ -58,11 +58,11 @@ class FakeArgObject:
 # Build fake object to bypass argparse
 fake_args = FakeArgObject('uninit', False, False, False, False, False, True)
 
-raise_threshold = 1000
+raise_threshold = 100
 raise_count = 0
 
 @atheris.instrument_func
-def raise_sometimes(e, percent: int):
+def raise_sometimes(e):
     """
     Optionally raise an exception by a percentile
     """
@@ -88,12 +88,12 @@ def TestOneInput(data):
         if 'bad query' in str(e):
             # This is raised too often to even be fuzzable, as urllib exceptions were not caught by the target
             return -1
-        raise_sometimes(e, 2)
+        raise_sometimes(e)
     except SystemExit:
         # The program exits with 1 if it can't find any OTPs, which is expected
         return -1
     except Exception as e:
-        raise_sometimes(e, 2)
+        raise_sometimes(e)
 
 def main():
     atheris.Setup(sys.argv, TestOneInput)
