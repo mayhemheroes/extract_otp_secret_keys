@@ -73,6 +73,9 @@ def TestOneInput(data):
         return -1
     except ValueError as e:
         return -1
+    except SystemExit:
+        # The program exits with 1 if it can't find any OTPs, which is expected
+        return -1
 
 def main():
     atheris.Setup(sys.argv, TestOneInput)
