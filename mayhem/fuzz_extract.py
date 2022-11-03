@@ -84,12 +84,12 @@ def TestOneInput(data):
         if 'bad query' in str(e):
             # This is raised too often to even be fuzzable, as urllib exceptions were not caught by the target
             return -1
-        raise_sometimes(e, 25)
+        raise_sometimes(e, 5)
     except SystemExit:
         # The program exits with 1 if it can't find any OTPs, which is expected
         return -1
     except Exception as e:
-        raise_sometimes(e, 25)
+        raise_sometimes(e, 5)
 
 def main():
     atheris.Setup(sys.argv, TestOneInput)
