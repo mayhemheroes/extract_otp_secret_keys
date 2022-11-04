@@ -58,7 +58,7 @@ class FakeArgObject:
 # Build fake object to bypass argparse
 fake_args = FakeArgObject('uninit', False, False, False, False, False, True)
 
-raise_threshold = 100
+raise_threshold = 50
 raise_count = 0
 
 @atheris.instrument_func
@@ -75,10 +75,11 @@ def raise_sometimes(e):
 
 @atheris.instrument_func
 def TestOneInput(data):
-    data = data.decode('utf-8', errors='ignore')
+    fdp = atheris.FuzzedDataProvider(data)
+    # data = data.decode('utf-8', errors='ignore')
 
     try:
-        with io.StringIO(data) as f:
+        with io.StringIO(fdp.ConsumeUnicodeNoSurrogates(fdp.remaining_bytes())) as f:
             fake_args.infile = f
             with nostdout():
                 extract_otps(fake_args)
