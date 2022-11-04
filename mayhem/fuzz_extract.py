@@ -64,7 +64,7 @@ def raise_sometimes(e):
     """
     Optionally raise an exception by a percentile
     """
-    if random.getrandbits(4) == 0:
+    if random.getrandbits(8) == 0:
         raise e
 
 @atheris.instrument_func
@@ -74,10 +74,20 @@ def TestOneInput(data):
     try:
         with io.StringIO(data) as f:
             fake_args.infile = f
-            extract_otps(fake_args)
+            with nostdout():
+                extract_otps(fake_args)
     except SystemExit:
         # The program exits with 1 if it can't find any OTPs, which is expected
         return -1
+    except binascii.Error:
+        # Raised too often
+        return -1
+    except google.protobuf.message.Error:
+        return -1
+    except ValueError as e:
+        if 'bad query' in str(e):
+            return -1
+        raise_sometimes(e)
     except Exception as e:
         raise_sometimes(e)
 
