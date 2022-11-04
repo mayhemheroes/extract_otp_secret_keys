@@ -23,9 +23,9 @@ fileinput.input = lambda x: x
 source_dir = Path(os.path.dirname(os.path.abspath(__file__))).parent.absolute()
 sys.path.insert(1, str(source_dir))
 
-# with atheris.instrument_imports():
-import extract_otp_secret_keys
-from extract_otp_secret_keys import extract_otps
+with atheris.instrument_imports():
+    import extract_otp_secret_keys
+    from extract_otp_secret_keys import extract_otps
 
 # No logging
 logging.disable(logging.CRITICAL)
@@ -74,8 +74,7 @@ def TestOneInput(data):
     try:
         with io.StringIO(data) as f:
             fake_args.infile = f
-            with nostdout():
-                extract_otps(fake_args)
+            extract_otps(fake_args)
     except SystemExit:
         # The program exits with 1 if it can't find any OTPs, which is expected
         return -1
