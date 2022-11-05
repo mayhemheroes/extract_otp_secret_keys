@@ -64,7 +64,7 @@ def raise_sometimes(e):
     """
     Optionally raise an exception by a percentile
     """
-    if random.getrandbits(6) == 0:
+    if random.getrandbits(5) == 0:
         raise e
 
 @atheris.instrument_func
