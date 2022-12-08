@@ -23,7 +23,7 @@ fileinput.input = lambda x: x
 source_dir = Path(os.path.dirname(os.path.abspath(__file__))).parent.absolute()
 sys.path.insert(1, str(source_dir))
 
-with atheris.instrument_imports():
+with atheris.instrument_imports(include=['extract_otp_secret_keys']):
     import extract_otp_secret_keys
     from extract_otp_secret_keys import extract_otps
 
@@ -59,13 +59,6 @@ class FakeArgObject:
 # Build fake object to bypass argparse
 fake_args = FakeArgObject('uninit', False, False, False, False, False, True)
 
-@atheris.instrument_func
-def raise_sometimes(e):
-    """
-    Optionally raise an exception by a percentile
-    """
-    if random.getrandbits(3) == 0:
-        raise e
 
 @atheris.instrument_func
 def TestOneInput(data):
@@ -85,11 +78,7 @@ def TestOneInput(data):
     except google.protobuf.message.Error:
         return -1
     except ValueError as e:
-        if 'bad query' in str(e):
-            return -1
-        raise_sometimes(e)
-    except Exception as e:
-        raise_sometimes(e)
+        return -1
 
 def main():
     atheris.Setup(sys.argv, TestOneInput)
